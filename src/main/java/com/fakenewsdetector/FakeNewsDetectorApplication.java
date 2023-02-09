@@ -1,4 +1,4 @@
-package com.fakenewsdetector.demo;
+package com.fakenewsdetector;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

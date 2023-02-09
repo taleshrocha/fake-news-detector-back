@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>demo</name>
+	<name>fake-news-detector-back</name>
 	<comment>Project fake-news-detector-back created by Buildship.</comment>
 	<projects>
 	</projects>
@@ -22,7 +22,7 @@
 	</natures>
 	<filteredResources>
 		<filter>
-			<id>1675933655055</id>
+			<id>0</id>
 			<name></name>
 			<type>30</type>
 			<matcher>
