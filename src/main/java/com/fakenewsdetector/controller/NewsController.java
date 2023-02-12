@@ -28,14 +28,14 @@ public class NewsController {
   private final NewsModelAssembler newsAssembler;
 
   NewsController(NewsRepository newsRepository, NewsModelAssembler newsAssembler) {
-    this.NewsRepository = newsRepository;
-    this.NewsAssembler = newsAssembler;
+    this.newsRepository = newsRepository;
+    this.newsAssembler = newsAssembler;
   }
 
   @GetMapping("/news")
   public CollectionModel<EntityModel<News>> all() {
 
-    List<EntityModel<News>> news = NewsRepository.findAll().stream()
+    List<EntityModel<News>> news = newsRepository.findAll().stream()
         .map(newsAssembler::toModel)
         .collect(Collectors.toList());
 
@@ -47,15 +47,15 @@ public class NewsController {
   @GetMapping("/news/{id}")
   public EntityModel<News> one(@PathVariable Long id) {
 
-    News news = NewsRepository.findById(id)
+    News news = newsRepository.findById(id)
         .orElseThrow(() -> new NewsNotFoundException(id));
 
-    return NewsAssembler.toModel(news);
+    return newsAssembler.toModel(news);
   }
 
   @PostMapping("/news")
   public ResponseEntity<?> newNews(@RequestBody News newNews) {
-    EntityModel<News> entityModel = newsAssembler.toModel(NewsRepository.save(newNews));
+    EntityModel<News> entityModel = newsAssembler.toModel(newsRepository.save(newNews));
 
     return ResponseEntity
         .created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri())
@@ -65,7 +65,7 @@ public class NewsController {
   @DeleteMapping("/news/{id}")
   public ResponseEntity<?> removeNews(@PathVariable Long id) {
 
-    NewsRepository.deleteById(id);
+    newsRepository.deleteById(id);
 
     return ResponseEntity.noContent().build();
   }
