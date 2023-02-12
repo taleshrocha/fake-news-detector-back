@@ -16,9 +16,9 @@ class LoadDatabase {
 	@Bean
 	CommandLineRunner initDatabase(NewsRepository newsRespository) {
 		return args -> {
-			newsRespository.save(new News("Tales", "2023/02/09", "AHHH", 0.50));
-			newsRespository.save(new News("a", "2023/02/09", "AHHH", 0.50));
-			newsRespository.save(new News("b", "2023/02/09", "AHHH", 0.50));
+			newsRespository.save(new News("Tales", "2023/02/09", "AHHH"));
+			newsRespository.save(new News("a", "2023/02/09", "AHHH"));
+			newsRespository.save(new News("b", "2023/02/09", "AHHH"));
 			newsRespository.findAll().forEach(news -> log.info("PRELOADED " + news));
 		};
 	}

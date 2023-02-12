@@ -55,6 +55,7 @@ public class NewsController {
 
   @PostMapping("/news")
   public ResponseEntity<?> newNews(@RequestBody News newNews) {
+    newNews.setProcessedContent(newNews.processContent(newNews.getContent()));
     EntityModel<News> entityModel = newsAssembler.toModel(newsRepository.save(newNews));
 
     return ResponseEntity
