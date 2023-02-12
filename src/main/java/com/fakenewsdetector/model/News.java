@@ -3,19 +3,29 @@ package com.fakenewsdetector.model;
 import java.util.*;
 import java.text.Normalizer;
 import java.util.Objects;
+import java.lang.Math;
+import java.lang.ArithmeticException;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
+import jakarta.persistence.Lob;
+
+import org.apache.commons.text.similarity.CosineDistance;
+import org.apache.commons.text.similarity.LevenshteinDistance;
+import org.apache.commons.text.similarity.JaroWinklerDistance;
+
+import com.fakenewsdetector.dao.NewsRepository;
 
 @Entity
 public class News {
 	private @Id @GeneratedValue Long id;
 	private String author;
 	private String date;
-	private String content;
-	private String processedContent;
-	private Double fakeRate;
+	private @Lob @Column String content;
+	private @Lob @Column String processedContent;
+	private Double cosineRate;
 
 	public News() {
 	}
@@ -25,6 +35,7 @@ public class News {
 		this.date = date;
 		this.content = content;
 		this.processedContent = processContent(this.content);
+		this.cosineRate = null;
 	}
 
 	// ### Gets and Setters ###
@@ -49,8 +60,8 @@ public class News {
 		return processedContent;
 	}
 
-	public Double getFakeRate() {
-		return fakeRate;
+	public Double getCosineRate() {
+		return cosineRate;
 	}
 
 	public void setAuthor(String author) {
@@ -69,8 +80,8 @@ public class News {
 		this.processedContent = processedContent;
 	}
 
-	public void setFakeRate(Double fakeRate) {
-		this.fakeRate = fakeRate;
+	public void setCosineRate(Double cosineRate) {
+		this.cosineRate = cosineRate;
 	}
 
 	// ### Methods ###
@@ -107,6 +118,22 @@ public class News {
 		return content;
 	}
 
+	public double processCosineRate(List<News> allNews) {
+		CosineDistance cosineDistance = new CosineDistance();
+		double rate = 0.0;
+
+		for (News news : allNews) {
+			rate = Math.max(
+					cosineDistance
+							.apply(this.getProcessedContent(), news.getProcessedContent()),
+					rate);
+		}
+
+		return rate;
+	}
+
+	// ### Override ###
+
 	@Override
 	public boolean equals(Object o) {
 		if (this == o)
@@ -120,12 +147,12 @@ public class News {
 				&& Objects.equals(this.author, news.author)
 				&& Objects.equals(this.date, news.date)
 				&& Objects.equals(this.content, news.content)
-				&& Objects.equals(this.fakeRate, news.fakeRate);
+				&& Objects.equals(this.cosineRate, news.cosineRate);
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(this.id, this.author, this.date, this.content, this.fakeRate);
+		return Objects.hash(this.id, this.author, this.date, this.content, this.cosineRate);
 	}
 
 	@Override
@@ -135,7 +162,7 @@ public class News {
 				+ ", author=" + this.author
 				+ ", date=" + this.date
 				+ ", content=" + this.content
-				+ ", fakeRate=" + this.fakeRate
+				+ ", cosineRate=" + this.cosineRate
 				+ "}";
 	}
 }

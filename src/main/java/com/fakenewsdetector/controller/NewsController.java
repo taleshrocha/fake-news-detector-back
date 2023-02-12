@@ -55,7 +55,12 @@ public class NewsController {
 
   @PostMapping("/news")
   public ResponseEntity<?> newNews(@RequestBody News newNews) {
+    List<News> allNews = newsRepository.findAll().stream()
+        .collect(Collectors.toList());
+
     newNews.setProcessedContent(newNews.processContent(newNews.getContent()));
+    newNews.setCosineRate(newNews.processCosineRate(allNews));
+
     EntityModel<News> entityModel = newsAssembler.toModel(newsRepository.save(newNews));
 
     return ResponseEntity
@@ -71,4 +76,3 @@ public class NewsController {
     return ResponseEntity.noContent().build();
   }
 }
-
