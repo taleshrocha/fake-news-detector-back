@@ -26,6 +26,7 @@ public class News {
 	private @Lob @Column String content;
 	private @Lob @Column String processedContent;
 	private Double cosineRate;
+	private Double levenRate;
 
 	public News() {
 	}
@@ -36,6 +37,7 @@ public class News {
 		this.content = content;
 		this.processedContent = processContent(this.content);
 		this.cosineRate = null;
+		this.levenRate = null;
 	}
 
 	// ### Gets and Setters ###
@@ -64,6 +66,10 @@ public class News {
 		return cosineRate;
 	}
 
+	public Double getLevenRate() {
+		return levenRate;
+	}
+
 	public void setAuthor(String author) {
 		this.author = author;
 	}
@@ -84,11 +90,15 @@ public class News {
 		this.cosineRate = cosineRate;
 	}
 
+	public void setLevenRate(Double levenRate) {
+		this.levenRate = levenRate;
+	}
+
 	// ### Methods ###
 
 	public String processContent(String content) {
-		content = Normalizer.normalize(content, Normalizer.Form.NFD);
-		content = content
+		content = Normalizer
+				.normalize(content, Normalizer.Form.NFD)
 				.replaceAll("[^\\x00-\\x7F]", "")
 				.replaceAll("\\b\\w{1,3}\\b\\s?", "")
 				.replaceAll("[^a-zA-Z0-9\\s]", "")
@@ -118,15 +128,30 @@ public class News {
 		return content;
 	}
 
+	public double processLevenRate(List<News> allNews) {
+		LevenshteinDistance levenDistance = new LevenshteinDistance();
+		double rate = 0.0;
+
+		for (News news : allNews) {
+			rate = Math.max(
+					(1.0 - (double) levenDistance.apply(this.getProcessedContent(), news.getProcessedContent()) /
+							(double) Math.max(this.getProcessedContent().length(), news.getProcessedContent().length())),
+					rate);
+		}
+
+		return rate;
+	}
+
 	public double processCosineRate(List<News> allNews) {
 		CosineDistance cosineDistance = new CosineDistance();
 		double rate = 0.0;
 
 		for (News news : allNews) {
-			rate = Math.max(
-					cosineDistance
+			rate = Math.max(1.0 - cosineDistance
 							.apply(this.getProcessedContent(), news.getProcessedContent()),
 					rate);
+			System.out.println("dist: " + (double) (1.0 - cosineDistance
+					.apply(this.getProcessedContent(), news.getProcessedContent())));
 		}
 
 		return rate;
