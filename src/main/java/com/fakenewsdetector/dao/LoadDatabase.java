@@ -39,7 +39,7 @@ class LoadDatabase {
 			return args -> {
 				for (String[] row : allData) {
 					if (row[0] != "") {
-						newsRespository.save(new News(row[2], row[3], row[1]));
+						newsRespository.save(new News(row[2], row[3], row[1], true));
 					}
 				}
 				newsRespository.findAll().forEach(news -> log.info("PRELOADED " + news));
@@ -49,9 +49,9 @@ class LoadDatabase {
 		}
 
 		return args -> {
-			newsRespository.save(new News("Tales", "2023/02/09", "AHHH"));
-			newsRespository.save(new News("a", "2023/02/09", "AHHH"));
-			newsRespository.save(new News("b", "2023/02/09", "AHHH"));
+			newsRespository.save(new News("Tales", "2023/02/09", "AHHH", true));
+			newsRespository.save(new News("a", "2023/02/09", "AHHH", true));
+			newsRespository.save(new News("b", "2023/02/09", "AHHH", true));
 			newsRespository.findAll().forEach(news -> log.info("PRELOADED " + news));
 		};
 	}

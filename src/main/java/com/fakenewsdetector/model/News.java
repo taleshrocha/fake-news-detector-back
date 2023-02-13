@@ -25,6 +25,7 @@ public class News {
 	private String date;
 	private @Lob @Column String content;
 	private @Lob @Column String processedContent;
+	private boolean base;
 	private Double cosineRate;
 	private Double levenRate;
 	private Double jaroRate;
@@ -32,7 +33,7 @@ public class News {
 	public News() {
 	}
 
-	public News(String author, String date, String content) {
+	public News(String author, String date, String content, boolean base) {
 		this.author = author;
 		this.date = date;
 		this.content = content;
@@ -40,6 +41,7 @@ public class News {
 		this.cosineRate = null;
 		this.levenRate = null;
 		this.jaroRate = null;
+		this.base = base;
 	}
 
 	// ### Gets and Setters ###
@@ -62,6 +64,10 @@ public class News {
 
 	public String getProcessedContent() {
 		return processedContent;
+	}
+
+	public boolean getBase() {
+		return base;
 	}
 
 	public Double getCosineRate() {
@@ -90,6 +96,10 @@ public class News {
 
 	public void setProcessedContent(String processedContent) {
 		this.processedContent = processedContent;
+	}
+
+	public void setBase(boolean base) {
+		this.base = base;
 	}
 
 	public void setCosineRate(Double cosineRate) {
@@ -173,8 +183,6 @@ public class News {
 			rate = Math.max(1.0 - jaroDistance
 					.apply(this.getProcessedContent(), news.getProcessedContent()),
 					rate);
-			System.out.println("dist: " + (1.0 - jaroDistance
-					.apply(this.getProcessedContent(), news.getProcessedContent())));
 		}
 
 		return rate;
@@ -197,12 +205,13 @@ public class News {
 				&& Objects.equals(this.content, news.content)
 				&& Objects.equals(this.cosineRate, news.cosineRate)
 				&& Objects.equals(this.levenRate, news.levenRate)
-				&& Objects.equals(this.jaroRate, news.jaroRate);
+				&& Objects.equals(this.jaroRate, news.jaroRate)
+				&& Objects.equals(this.base, news.base);
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(this.id, this.author, this.date, this.content, this.cosineRate, this.levenRate, this.jaroRate);
+		return Objects.hash(this.id, this.author, this.date, this.content, this.cosineRate, this.levenRate, this.jaroRate, this.base);
 	}
 
 	@Override
@@ -215,6 +224,7 @@ public class News {
 				+ ", cosineRate=" + this.cosineRate
 				+ ", levenRate=" + this.levenRate
 				+ ", jaroRate=" + this.jaroRate
+				+ ", base=" + this.base
 				+ "}";
 	}
 }
