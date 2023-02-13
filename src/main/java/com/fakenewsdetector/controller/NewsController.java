@@ -57,13 +57,13 @@ public class NewsController {
   }
 
   @PutMapping("/news/{algo}")
-  public ResponseEntity<?> cosineAll(@PathVariable String algo) {
+  public ResponseEntity<?> algoAll(@PathVariable String algo) {
 
-    // Get all the news considered fake (the base)
+    // Get all the news considered fake (the "base")
     List<News> base = newsRepository.findByBaseEquals(true).stream()
         .collect(Collectors.toList());
 
-    // Update all News that are not base, change the cosineRate and save
+    // Update all the News that are not in "base", change the {algo}Rate and save
     newsRepository.findByBaseEquals(false)
         .forEach(news -> {
           switch (algo) {
@@ -83,6 +83,17 @@ public class NewsController {
         });
 
     return ResponseEntity.noContent().build();
+  }
+
+  @PutMapping("/news/base/{value}/{id}")
+  public EntityModel<News> updateBase(@PathVariable boolean value, @PathVariable Long id) {
+
+    News news = newsRepository.findById(id)
+        .orElseThrow(() -> new NewsNotFoundException(id));
+    news.setBase(value);
+    newsRepository.save(news);
+
+    return newsAssembler.toModel(news);
   }
 
   @GetMapping("/news/{id}")
