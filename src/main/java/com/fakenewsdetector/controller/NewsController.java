@@ -61,6 +61,7 @@ public class NewsController {
     newNews.setProcessedContent(newNews.processContent(newNews.getContent()));
     newNews.setCosineRate(newNews.processCosineRate(allNews));
     newNews.setLevenRate(newNews.processLevenRate(allNews));
+    newNews.setJaroRate(newNews.processJaroRate(allNews));
 
     EntityModel<News> entityModel = newsAssembler.toModel(newsRepository.save(newNews));
 

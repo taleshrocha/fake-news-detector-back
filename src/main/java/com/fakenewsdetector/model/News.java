@@ -27,6 +27,7 @@ public class News {
 	private @Lob @Column String processedContent;
 	private Double cosineRate;
 	private Double levenRate;
+	private Double jaroRate;
 
 	public News() {
 	}
@@ -38,6 +39,7 @@ public class News {
 		this.processedContent = processContent(this.content);
 		this.cosineRate = null;
 		this.levenRate = null;
+		this.jaroRate = null;
 	}
 
 	// ### Gets and Setters ###
@@ -70,6 +72,10 @@ public class News {
 		return levenRate;
 	}
 
+	public Double getJaroRate() {
+		return jaroRate;
+	}
+
 	public void setAuthor(String author) {
 		this.author = author;
 	}
@@ -92,6 +98,10 @@ public class News {
 
 	public void setLevenRate(Double levenRate) {
 		this.levenRate = levenRate;
+	}
+
+	public void setJaroRate(Double jaroRate) {
+		this.jaroRate = jaroRate;
 	}
 
 	// ### Methods ###
@@ -128,6 +138,19 @@ public class News {
 		return content;
 	}
 
+	public double processCosineRate(List<News> allNews) {
+		CosineDistance cosineDistance = new CosineDistance();
+		double rate = 0.0;
+
+		for (News news : allNews) {
+			rate = Math.max(1.0 - cosineDistance
+					.apply(this.getProcessedContent(), news.getProcessedContent()),
+					rate);
+		}
+
+		return rate;
+	}
+
 	public double processLevenRate(List<News> allNews) {
 		LevenshteinDistance levenDistance = new LevenshteinDistance();
 		double rate = 0.0;
@@ -135,22 +158,22 @@ public class News {
 		for (News news : allNews) {
 			rate = Math.max(
 					(1.0 - (double) levenDistance.apply(this.getProcessedContent(), news.getProcessedContent()) /
-							(double) Math.max(this.getProcessedContent().length(), news.getProcessedContent().length())),
+							Math.max(this.getProcessedContent().length(), news.getProcessedContent().length())),
 					rate);
 		}
 
 		return rate;
 	}
 
-	public double processCosineRate(List<News> allNews) {
-		CosineDistance cosineDistance = new CosineDistance();
+	public double processJaroRate(List<News> allNews) {
+		JaroWinklerDistance jaroDistance = new JaroWinklerDistance();
 		double rate = 0.0;
 
 		for (News news : allNews) {
-			rate = Math.max(1.0 - cosineDistance
-							.apply(this.getProcessedContent(), news.getProcessedContent()),
+			rate = Math.max(1.0 - jaroDistance
+					.apply(this.getProcessedContent(), news.getProcessedContent()),
 					rate);
-			System.out.println("dist: " + (double) (1.0 - cosineDistance
+			System.out.println("dist: " + (1.0 - jaroDistance
 					.apply(this.getProcessedContent(), news.getProcessedContent())));
 		}
 
@@ -172,12 +195,14 @@ public class News {
 				&& Objects.equals(this.author, news.author)
 				&& Objects.equals(this.date, news.date)
 				&& Objects.equals(this.content, news.content)
-				&& Objects.equals(this.cosineRate, news.cosineRate);
+				&& Objects.equals(this.cosineRate, news.cosineRate)
+				&& Objects.equals(this.levenRate, news.levenRate)
+				&& Objects.equals(this.jaroRate, news.jaroRate);
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(this.id, this.author, this.date, this.content, this.cosineRate);
+		return Objects.hash(this.id, this.author, this.date, this.content, this.cosineRate, this.levenRate, this.jaroRate);
 	}
 
 	@Override
@@ -188,6 +213,8 @@ public class News {
 				+ ", date=" + this.date
 				+ ", content=" + this.content
 				+ ", cosineRate=" + this.cosineRate
+				+ ", levenRate=" + this.levenRate
+				+ ", jaroRate=" + this.jaroRate
 				+ "}";
 	}
 }
