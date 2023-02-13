@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import com.fakenewsdetector.assembler.NewsModelAssembler;
 import com.fakenewsdetector.dao.NewsRepository;
+import com.fakenewsdetector.exception.AlgoNotFoundException;
 import com.fakenewsdetector.exception.NewsNotFoundException;
 import com.fakenewsdetector.model.News;
 
@@ -55,19 +56,29 @@ public class NewsController {
         linkTo(methodOn(NewsController.class).all()).withSelfRel());
   }
 
-  // newNews.setLevenRate(newNews.processLevenRate(allNews));
-  // newNews.setJaroRate(newNews.processJaroRate(allNews));
-  @PutMapping("/news/cosine")
-  public ResponseEntity<?> cosineAll() {
+  @PutMapping("/news/{algo}")
+  public ResponseEntity<?> cosineAll(@PathVariable String algo) {
 
     // Get all the news considered fake (the base)
     List<News> base = newsRepository.findByBaseEquals(true).stream()
         .collect(Collectors.toList());
 
-    // Get all News that are not base, change the cosineRate and save
+    // Update all News that are not base, change the cosineRate and save
     newsRepository.findByBaseEquals(false)
         .forEach(news -> {
-          news.setCosineRate(news.processCosineRate(base));
+          switch (algo) {
+            case "cosine":
+              news.setCosineRate(news.processCosineRate(base));
+              break;
+            case "leven":
+              news.setLevenRate(news.processLevenRate(base));
+              break;
+            case "jaro":
+              news.setJaroRate(news.processJaroRate(base));
+              break;
+            default:
+              throw new AlgoNotFoundException(algo);
+          }
           newsRepository.save(news);
         });
 
