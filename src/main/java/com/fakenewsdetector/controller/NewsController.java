@@ -58,6 +58,7 @@ public class NewsController {
 
   @PutMapping("/news/{algo}")
   public ResponseEntity<?> algoAll(@PathVariable String algo) {
+    System.out.println("algo: " + algo);
 
     // Get all the news considered fake (the "base")
     List<News> base = newsRepository.findByBaseEquals(true).stream()
@@ -66,18 +67,15 @@ public class NewsController {
     // Update all the News that are not in "base", change the {algo}Rate and save
     newsRepository.findByBaseEquals(false)
         .forEach(news -> {
-          switch (algo) {
-            case "cosine":
-              news.setCosineRate(news.processCosineRate(base));
-              break;
-            case "leven":
-              news.setLevenRate(news.processLevenRate(base));
-              break;
-            case "jaro":
-              news.setJaroRate(news.processJaroRate(base));
-              break;
-            default:
-              throw new AlgoNotFoundException(algo);
+          System.out.println("2algo: " + algo);
+          if (algo.equals("cosine")) {
+            news.setCosineRate(news.processCosineRate(base));
+          } else if (algo.equals("leven")) {
+            news.setLevenRate(news.processLevenRate(base));
+          } else if (algo.equals("jaro")) {
+            news.setJaroRate(news.processJaroRate(base));
+          } else {
+            throw new AlgoNotFoundException(algo);
           }
           newsRepository.save(news);
         });
