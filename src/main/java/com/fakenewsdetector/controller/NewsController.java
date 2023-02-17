@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.IanaLinkRelations;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -56,7 +57,7 @@ public class NewsController {
         linkTo(methodOn(NewsController.class).all()).withSelfRel());
   }
 
-  @PutMapping("/news/{algo}")
+  @PutMapping("/news/blah/{algo}")
   public ResponseEntity<?> algoAll(@PathVariable String algo) {
     System.out.println("algo: " + algo);
 
@@ -112,6 +113,39 @@ public class NewsController {
     return ResponseEntity
         .created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri())
         .body(entityModel);
+  }
+
+  @PostMapping("/news/{algo}")
+  public ResponseEntity<?> getAlgo(@RequestBody News news, @PathVariable String algo) {
+
+    // Get all the news considered fake (the "base")
+    List<News> base = newsRepository.findByBaseEquals(true).stream()
+        .collect(Collectors.toList());
+
+    news.setProcessedContent(news.processContent(news.getContent()));
+
+    double med = 0.0;
+    int count = 0;
+    if (algo.contains("cosine")) {
+      news.setCosineRate(news.processCosineRate(base));
+      med += news.getCosineRate();
+      count++;
+    }
+    if (algo.contains("leven")) {
+      news.setLevenRate(news.processLevenRate(base));
+      med += news.getLevenRate();
+      count++;
+    }
+    if (algo.contains("jaro")) {
+      news.setJaroRate(news.processJaroRate(base));
+      med += news.getJaroRate();
+      count++;
+    } else {
+      throw new AlgoNotFoundException(algo);
+    }
+
+    return ResponseEntity.ok(med/count);
+
   }
 
   @DeleteMapping("/news/{id}")
