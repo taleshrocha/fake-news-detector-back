@@ -2,6 +2,10 @@ package com.fakenewsdetector.controller;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 
+import java.io.File;
+import java.io.FileReader;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -16,12 +20,20 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
+
 import com.fakenewsdetector.assembler.NewsModelAssembler;
 import com.fakenewsdetector.dao.NewsRepository;
 import com.fakenewsdetector.exception.AlgoNotFoundException;
 import com.fakenewsdetector.exception.NewsNotFoundException;
 import com.fakenewsdetector.model.News;
+
+import com.opencsv.CSVParser;
+import com.opencsv.CSVParserBuilder;
+import com.opencsv.CSVReader;
+import com.opencsv.CSVReaderBuilder;
 
 @RestController
 public class NewsController {
@@ -140,12 +152,41 @@ public class NewsController {
       news.setJaroRate(news.processJaroRate(base));
       med += news.getJaroRate();
       count++;
-    } else {
+    }
+    if (!(algo.contains("jaro") || algo.contains("leven") || algo.contains("cosine"))) {
       throw new AlgoNotFoundException(algo);
     }
 
-    return ResponseEntity.ok(med/count);
+    return ResponseEntity.ok(med / count);
 
+  }
+
+  @PostMapping("/news/csv")
+  public ResponseEntity<?> postFile(@RequestParam("file") MultipartFile multipartfile) {
+
+    try {
+      Reader reader = new InputStreamReader(multipartfile.getInputStream());
+      CSVParser parser = new CSVParserBuilder().withSeparator(',').build();
+
+      CSVReader csvReader = new CSVReaderBuilder(reader).withCSVParser(parser).build();
+
+      // Gets all CSV rows in a List<String[]>
+      List<String[]> allData = csvReader.readAll();
+
+      // Removes the CSV index line.
+      allData.remove(0);
+
+      for (String[] row : allData) {
+        if (row[0] != "") {
+          newsRepository.save(new News(row[2], row[3], row[1], true));
+        }
+      }
+    } catch (Exception ex) {
+      ex.printStackTrace();
+      return ResponseEntity.internalServerError().build();
+    }
+
+    return ResponseEntity.noContent().build();
   }
 
   @DeleteMapping("/news/{id}")
