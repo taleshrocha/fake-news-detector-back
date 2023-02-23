@@ -95,10 +95,10 @@ Done with ❤️ by Tales Rocha 👋🏽 Contact me!
 [javascript-badge]: https://img.shields.io/badge/javascript-20232A?style=for-the-badge&logo=javascript
 [javascript-url]: https://www.javascript.com/
 [firebase-badge]: https://img.shields.io/badge/firebase-20232A?style=for-the-badge&logo=firebase
-[firebase-url]: https://firebase.google.com/
+[firebase-url]: https://google.com/
 [java-badge]: https://img.shields.io/badge/java-20232A?style=for-the-badge&logo=java
-[java-url]:
+[java-url]: https://google.com/
 [spring-badge]: https://img.shields.io/badge/spring-20232A?style=for-the-badge&logo=spring
-[spring-url]:
+[spring-url]: https://google.com/
 [gradlew-badge]: https://img.shields.io/badge/gradlew-20232A?style=for-the-badge&logo=gradlew
-[gradlew-url]:
+[gradlew-url]: https://google.com/
